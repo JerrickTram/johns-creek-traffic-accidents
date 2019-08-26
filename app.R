@@ -78,7 +78,7 @@ reactive_totals = reactive({
     group_by(PeakHour, MannerOfCollision, WeatherCondition, LightingCondition) %>% 
     summarise(Total = n(),
               Percent = round(Total / nrow(reactive_data()), 2)) %>% 
-    select(-geometry) %>% 
+    select(-geometry) %>% # Shifts geometry column to become the last column; can't remove
     arrange(desc(Total)) 
 })
   
