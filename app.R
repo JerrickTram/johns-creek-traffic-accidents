@@ -142,7 +142,7 @@ output$weekly = renderPlotly({
     summarize(Accidents = n()) %>% 
     ggplot(aes(Week, Accidents)) +
     geom_col() +
-    labs(title = "Accidents from the Last 4 Weeks")
+    labs(title = "Accidents from the Last 4 to 5 Weeks")
   
   ggplotly(weekly)
   })
@@ -156,7 +156,7 @@ output$daily = renderPlotly({
     ggplot(aes(Day, Accidents)) +
     geom_line() +
     geom_point() +
-    labs(title = "Accidents from the last 7 days") +
+    labs(title = "Accidents from the last 7 to 8 days") +
     scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10))
   
   ggplotly(daily)
