@@ -4,7 +4,6 @@ library(geojsonsf)
 library(lubridate)
 library(leaflet)
 library(plotly)
-library(rsconnect)
 library(sf)
 library(shiny)
 library(shinythemes)
@@ -43,7 +42,9 @@ ui <- fluidPage(theme = shinytheme("united"),
       ),
       br(),
       p(strong("Disclaimer:"), "In the 2nd tab, peak hours are defined as 
-        time periods between 7 to 9 AM and 4 to 6 PM.")
+        time periods between 7 to 9 AM and 4 to 6 PM."),
+      br(),
+      a("Link to Repository", href = "https://github.com/JerrickTram/johns-creek-traffic-accidents")
     ),
     
     mainPanel(
@@ -96,7 +97,7 @@ output$map = renderLeaflet({
                              "Weather:", reactive_data()$WeatherCondition, "<br>",
                              "Lighting:", reactive_data()$LightingCondition))
   })
-
+# Creates data tables with options to export
 output$totals = renderDataTable({
   datatable(reactive_totals(),
             extensions = "Buttons",
@@ -106,7 +107,7 @@ output$totals = renderDataTable({
           )
       )
   })
-
+# Annual plot
 output$annual = renderPlotly({
   annual = reactive_data() %>% 
     mutate(Year = year(DateTimeOccurred)) %>% 
@@ -120,7 +121,7 @@ output$annual = renderPlotly({
   
   ggplotly(annual)
   })
-
+# Accidents since 6 months ago
 output$monthly = renderPlotly({  
   monthly = reactive_data() %>% 
     filter(DateTimeOccurred >= max(DateTimeOccurred) - months(6)) %>% 
@@ -133,7 +134,7 @@ output$monthly = renderPlotly({
 
   ggplotly(monthly)
   })
-
+# Accidents from 4-5 weeks ago 
 output$weekly = renderPlotly({  
   weekly = reactive_data() %>% 
     filter(DateTimeOccurred >= max(DateTimeOccurred) - weeks(4)) %>% 
@@ -146,7 +147,7 @@ output$weekly = renderPlotly({
   
   ggplotly(weekly)
   })
-
+# Accidents from 7-8 days ago
 output$daily = renderPlotly({
   daily = reactive_data() %>% 
     filter(DateTimeOccurred >= max(DateTimeOccurred) - days(7)) %>% 
