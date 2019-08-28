@@ -71,14 +71,13 @@ reactive_data = reactive({
 
 ## This reactive expression grabs the proportions of peak/off-peak hour crashes
 reactive_totals = reactive({
-  reactive_data() %>% 
+  as.data.frame(reactive_data()) %>% # Removes sf class
     mutate(PeakHour = ifelse(hour(DateTimeOccurred) >= 7 & hour(DateTimeOccurred) <= 9 |
                                hour(DateTimeOccurred) >= 16 & hour(DateTimeOccurred) <= 18, 
                              "Peak", "Off-Peak")) %>% 
     group_by(PeakHour, MannerOfCollision, WeatherCondition, LightingCondition) %>% 
     summarise(Total = n(),
               Percent = round(Total / nrow(reactive_data()), 2)) %>% 
-    select(-geometry) %>% # Shifts geometry column to become the last column; can't remove
     arrange(desc(Total)) 
 })
   
