@@ -142,9 +142,7 @@ output$weekly = renderPlotly({
     summarize(Accidents = n()) %>% 
     ggplot(aes(Week, Accidents)) +
     geom_col() +
-    labs(title = "Accidents from the Last 4 Weeks",
-         caption = "If a day doesn't have a point, it's assumed that 0
-         accidents occurred that day.")
+    labs(title = "Accidents from the Last 4 Weeks")
   
   ggplotly(weekly)
   })
