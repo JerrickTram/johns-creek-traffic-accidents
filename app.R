@@ -50,7 +50,11 @@ ui <- fluidPage(theme = shinytheme("united"),
       tabsetPanel(
         type = "tabs",
         tabPanel("Map", leafletOutput("map")),
-        tabPanel("Total", dataTableOutput("totals"))
+        tabPanel("Total", dataTableOutput("totals")),
+        tabPanel("Graphs", fluidRow(
+          column(6, plotlyOutput("annual"), plotlyOutput("weekly")),
+          column(6, plotlyOutput("monthly"), plotlyOutput("daily"))
+        ))
       )
     )
   )
@@ -71,7 +75,7 @@ reactive_data = reactive({
 
 ## This reactive expression grabs the proportions of peak/off-peak hour crashes
 reactive_totals = reactive({
-  as.data.frame(reactive_data()) %>% # Removes sf class
+  as.data.frame(reactive_data()) %>% 
     mutate(PeakHour = ifelse(hour(DateTimeOccurred) >= 7 & hour(DateTimeOccurred) <= 9 |
                                hour(DateTimeOccurred) >= 16 & hour(DateTimeOccurred) <= 18, 
                              "Peak", "Off-Peak")) %>% 
@@ -103,6 +107,62 @@ output$totals = renderDataTable({
       )
   })
 
+output$annual = renderPlotly({
+  annual = reactive_data() %>% 
+    mutate(Year = year(DateTimeOccurred)) %>% 
+    group_by(Year) %>% 
+    summarize(Accidents = n()) %>% 
+    ggplot(aes(Year, Accidents)) +
+    geom_line() +
+    geom_point() +
+    labs(title = "Annual Accidents") +
+    scale_x_continuous(breaks = c(2010, 2015, 2020))
+  
+  ggplotly(annual)
+  })
+
+output$monthly = renderPlotly({  
+  monthly = reactive_data() %>% 
+    filter(DateTimeOccurred >= max(DateTimeOccurred) - months(6)) %>% 
+    mutate(Month = month(DateTimeOccurred, label = TRUE, abbr = TRUE)) %>% 
+    group_by(Month) %>% 
+    summarize(Accidents = n()) %>% 
+    ggplot(aes(Month, Accidents)) +
+    geom_col() +
+    labs(title = "Accidents from the Last 6 Months")
+
+  ggplotly(monthly)
+  })
+
+output$weekly = renderPlotly({  
+  weekly = reactive_data() %>% 
+    filter(DateTimeOccurred >= max(DateTimeOccurred) - weeks(4)) %>% 
+    mutate(Week = week(DateTimeOccurred)) %>% 
+    group_by(Week) %>% 
+    summarize(Accidents = n()) %>% 
+    ggplot(aes(Week, Accidents)) +
+    geom_col() +
+    labs(title = "Accidents from the Last 4 Weeks",
+         caption = "If a day doesn't have a point, it's assumed that 0
+         accidents occurred that day.")
+  
+  ggplotly(weekly)
+  })
+
+output$daily = renderPlotly({
+  daily = reactive_data() %>% 
+    filter(DateTimeOccurred >= max(DateTimeOccurred) - days(7)) %>% 
+    mutate(Day = day(DateTimeOccurred)) %>% 
+    group_by(Day) %>% 
+    summarize(Accidents = n()) %>% 
+    ggplot(aes(Day, Accidents)) +
+    geom_line() +
+    geom_point() +
+    labs(title = "Accidents from the last 7 days") +
+    scale_y_continuous(breaks = c(0, 2, 4, 6, 8, 10))
+  
+  ggplotly(daily)
+  })
 }
 
 # Run the app ----
