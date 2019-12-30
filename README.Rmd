@@ -1,0 +1,15 @@
+---
+title: "Johns Creek Accident Types, Locations, and Frequencies Visualized"
+author: "Jerrick Tram"
+date: "2019/01/03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Data pulled from the [Atlanta Regional Commission's API](https://opendata.atlantaregional.com/datasets/JohnsCreekGA::traffic-accident-locations).
+
+<iframe src="https://jerricktram.shinyapps.io/johns-creek-traffic-accidents/" width=1000 height=800"></iframe>
+
